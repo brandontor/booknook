@@ -67,7 +67,7 @@ export const NavBar = () => {
   const [selectedItem, setSelectedItem] = useState(0);
 
   return (
-    <div className=" mt-14 w-full border-t-2 border-slate-500">
+    <div className=" mt-6 w-full border-t-2 border-slate-500">
       <ul
         role="tablist"
         className="mx-auto flex flex-col  gap-x-6 overflow-x-auto border-b text-sm"
