@@ -4,6 +4,7 @@ import { NavBar } from "~/components/NavBar";
 import { Button } from "../components/ui/Button";
 import { ButtonLoading } from "~/components/ui/ButtonLoading";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { useRouter } from "next/router";
 import type { UserResource } from "@clerk/types";
 
 interface Props {
@@ -38,6 +39,7 @@ export default Layout;
 
 const AppContainer = ({ children, user }: Props) => {
   if (!user) return <div>Something went Wrong</div>;
+  const {isReady} = useRouter()
 
   return (
     <div className="  flex h-5/6  w-11/12 rounded-lg bg-slate-100 shadow-sm shadow-slate-100">
@@ -57,6 +59,7 @@ const AppContainer = ({ children, user }: Props) => {
           <SignOutButton />
         </Button>
       </div>
+      {/* {!isReady ? <ButtonLoading></ButtonLoading> : children} */}
       {children}
     </div>
   );
