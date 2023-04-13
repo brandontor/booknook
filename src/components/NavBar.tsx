@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from 'next/link'
 
 export const NavBar = () => {
   const tabItems = [
@@ -21,6 +22,7 @@ export const NavBar = () => {
         </svg>
       ),
       name: "Home",
+      path:"/"
     },
     {
       icon: (
@@ -42,6 +44,7 @@ export const NavBar = () => {
         </svg>
       ),
       name: "New Post",
+      path:"/newpost"
     },
     {
       icon: (
@@ -62,6 +65,7 @@ export const NavBar = () => {
         </svg>
       ),
       name: "Profile",
+      path:"/profile"
     },
   ];
   const [selectedItem, setSelectedItem] = useState(0);
@@ -81,6 +85,7 @@ export const NavBar = () => {
                 : "border-slate-500 text-gray-500"
             }`}
           >
+            <Link href={`${item.path}`}>
             <button
               role="tab"
               aria-selected={selectedItem == idx ? true : false}
@@ -91,6 +96,8 @@ export const NavBar = () => {
               {item.icon}
               {item.name}
             </button>
+            </Link>
+        
           </li>
         ))}
       </ul>
