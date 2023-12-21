@@ -1,38 +1,43 @@
 "use client"
 
-import React, { useRef } from "react"
-import { useSearchParams } from "next/navigation"
+import React from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useDebouncedCallback } from "use-debounce"
 
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 type Props = {}
 
 function SearchBar({}: Props) {
   const searchParams = useSearchParams()
-  const inputRef = useRef(null)
-  const searchHandler = (book: string) => {
+  const pathname = usePathname()
+  const { replace } = useRouter()
+
+  const searchHandler = useDebouncedCallback(async (book: string) => {
     const params = new URLSearchParams(searchParams)
+    if (book) {
+      params.set("q", book)
+      const res = await fetch("/api/books?" + params, {
+        method: "GET",
+      })
+
+      console.log(await res.json())
+    } else {
+      params.delete("q")
+    }
     console.log(book)
-  }
+    replace(`${pathname}?${params.toString()}`)
+  }, 300)
 
   return (
     <div>
       <Input
         type="text"
-        ref={inputRef}
         onChange={(e) => {
           searchHandler(e.target.value)
         }}
+        defaultValue={searchParams.get("q")?.toString()}
       ></Input>
-      {/* <Button
-        type="submit"
-        onClick={() => {
-          searchHandler()
-        }}
-      >
-        Click Me!
-      </Button> */}
     </div>
   )
 }

@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
 
   const requestHeaders: HeadersInit = new Headers()
   requestHeaders.append("Content-Type", "application/json")
+
   Object.entries(searchParams).forEach((param) => {
     searchURL.searchParams.append(`${param[0]}`, `${param[1]}`)
   })
