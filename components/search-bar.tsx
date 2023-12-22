@@ -1,7 +1,15 @@
 "use client"
 
 import React, { useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
+import Image from "next/image"
+import Router, {
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation"
+import { CommandLoading } from "cmdk"
+import { BookIcon, Loader2 } from "lucide-react"
 import { useDebouncedCallback } from "use-debounce"
 
 import { cn } from "@/lib/utils"
@@ -19,13 +27,26 @@ import {
 
 import { Button } from "./ui/button"
 
+const commandActions: any = {
+  title: {
+    placeHolder: "Enter a title",
+    heading: "Search by Title Results",
+  },
+  author: {
+    placeHolder: "Enter an author",
+    heading: "Search by Author Results",
+  },
+}
+
 type Props = {}
 
 function SearchBar({}: Props) {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const pathname = usePathname()
   const { replace } = useRouter()
   const [results, setResults] = useState<Object[] | []>([])
+  const [loading, setLoading] = useState<boolean>(false)
   const [commandInput, setCommandInput] = React.useState<string>("initial")
   const [open, setOpen] = React.useState(false)
 
@@ -47,20 +68,8 @@ function SearchBar({}: Props) {
     }
   }, [open])
 
-  const commandActions: any = {
-    title: {
-      placeHolder: "Enter a title",
-      component: <TitleSearch results={results}></TitleSearch>,
-      heading: "Title Search Results",
-    },
-    author: {
-      placeHolder: "Enter an author",
-      component: <AuthorSearch results={results}></AuthorSearch>,
-      heading: "Author Search Results",
-    },
-  }
-
   const searchHandler = useDebouncedCallback(async (book: string) => {
+    setLoading(true)
     const params = new URLSearchParams(searchParams)
     if (book) {
       params.set("q", book)
@@ -69,12 +78,11 @@ function SearchBar({}: Props) {
       })
       let data = await res.json()
       setResults(data.data.items)
-      // console.log(data.data.items)
     } else {
       params.delete("q")
     }
-    // console.log(book)
     replace(`${pathname}?${params.toString()}`)
+    setLoading(false)
   }, 300)
 
   return (
@@ -111,7 +119,15 @@ function SearchBar({}: Props) {
         <CommandSeparator></CommandSeparator>
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          {commandInput !== "initial" && commandActions[commandInput].component}
+          {commandInput !== "initial" && (
+            <SearchResults
+              loading={loading}
+              results={results}
+              actionDetails={commandActions[commandInput]}
+              router={router}
+              setOpen={setOpen}
+            ></SearchResults>
+          )}
         </CommandList>
       </CommandDialog>
     </>
@@ -151,17 +167,59 @@ const InitialSearch = ({
   )
 }
 
-type SearchProps = {
+type SearchResultsProps = {
   results: Array<any>
+  loading: boolean
+  actionDetails: any
+  router: AppRouterInstance
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const TitleSearch = ({ results }: SearchProps) => {
+const SearchResults = ({
+  results,
+  loading,
+  actionDetails,
+  router,
+  setOpen,
+}: SearchResultsProps) => {
+  const BookImage = (result: any) => {
+    if (result.result.volumeInfo?.imageLinks) {
+      return (
+        <Image
+          alt={result.result.volumeInfo.title}
+          src={result.result.volumeInfo?.imageLinks?.thumbnail}
+          width={100}
+          height={100}
+          className="w-auto h-auto"
+        ></Image>
+      )
+    } else {
+      return (
+        <div className="w-16 h-12 ">
+          <p>No cover available</p>
+        </div>
+      )
+    }
+  }
+
+  const bookSelectionHandler = (result: any) => {
+    router.push(`/book/${result.id}`)
+    setOpen(false)
+  }
+
   return (
     <div>
-      <CommandGroup heading="Title Search Results">
-        {results &&
+      <CommandGroup heading={actionDetails.heading}>
+        {loading && (
+          <div className="w-full flex justify-center">
+            <CommandLoading>
+              <Loader2 className="my-4 h-12 w-8 animate-spin"></Loader2>
+            </CommandLoading>
+          </div>
+        )}
+        {!loading &&
+          results &&
           results.map((result) => {
-            console.log(result)
             return (
               <CommandItem
                 className="flex justify-between"
@@ -171,37 +229,11 @@ const TitleSearch = ({ results }: SearchProps) => {
                   "-" +
                   result.volumeInfo.publishedDate
                 }
+                onSelect={() => {
+                  bookSelectionHandler(result)
+                }}
               >
-                <img src={result.volumeInfo.imageLinks.thumbnail}></img>
-                {result.volumeInfo.title}
-                <span cmdk-raycast-meta="">
-                  {result.volumeInfo.publishedDate}
-                </span>
-              </CommandItem>
-            )
-          })}
-      </CommandGroup>
-    </div>
-  )
-}
-
-const AuthorSearch = ({ results }: SearchProps) => {
-  return (
-    <div>
-      <CommandGroup heading="Author Search Results">
-        {results &&
-          results.map((result) => {
-            console.log(result)
-            return (
-              <CommandItem
-                className="flex justify-between"
-                key={result.id}
-                value={
-                  result.volumeInfo.title +
-                  "-" +
-                  result.volumeInfo.publishedDate
-                }
-              >
+                <BookImage result={result}></BookImage>
                 {result.volumeInfo.title}
                 <span cmdk-raycast-meta="">
                   {result.volumeInfo.publishedDate}
