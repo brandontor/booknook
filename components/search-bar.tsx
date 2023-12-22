@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from "use-debounce"
 
@@ -16,7 +16,6 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import { Input } from "@/components/ui/input"
 
 import { Button } from "./ui/button"
 
@@ -26,6 +25,8 @@ function SearchBar({}: Props) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
+  const [results, setResults] = useState<Object[] | []>([])
+  const [commandInput, setCommandInput] = React.useState<string>("initial")
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -39,6 +40,26 @@ function SearchBar({}: Props) {
     return () => document.removeEventListener("keydown", down)
   }, [])
 
+  React.useEffect(() => {
+    if (!open) {
+      setCommandInput("initial")
+      setResults([])
+    }
+  }, [open])
+
+  const commandActions: any = {
+    title: {
+      placeHolder: "Enter a title",
+      component: <TitleSearch results={results}></TitleSearch>,
+      heading: "Title Search Results",
+    },
+    author: {
+      placeHolder: "Enter an author",
+      component: <AuthorSearch results={results}></AuthorSearch>,
+      heading: "Author Search Results",
+    },
+  }
+
   const searchHandler = useDebouncedCallback(async (book: string) => {
     const params = new URLSearchParams(searchParams)
     if (book) {
@@ -46,12 +67,13 @@ function SearchBar({}: Props) {
       const res = await fetch("/api/books?" + params, {
         method: "GET",
       })
-
-      console.log(await res.json())
+      let data = await res.json()
+      setResults(data.data.items)
+      // console.log(data.data.items)
     } else {
       params.delete("q")
     }
-    console.log(book)
+    // console.log(book)
     replace(`${pathname}?${params.toString()}`)
   }, 300)
 
@@ -71,25 +93,25 @@ function SearchBar({}: Props) {
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput
+          disabled={commandInput === "initial"}
+          placeholder={
+            commandInput !== "initial"
+              ? commandActions[commandInput].placeHolder
+              : "Click a command"
+          }
+          onChangeCapture={(e) => searchHandler(e.currentTarget.value)}
+        />
+        <CommandList>
+          <InitialSearch
+            setCommandInput={setCommandInput}
+            commandInput={commandInput}
+          ></InitialSearch>
+        </CommandList>
+        <CommandSeparator></CommandSeparator>
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Search">
-            <CommandItem
-              onSelect={() => {
-                console.log("TITLE")
-              }}
-            >
-              Search by Title
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                console.log("Author")
-              }}
-            >
-              Search by Author
-            </CommandItem>
-          </CommandGroup>
+          {commandInput !== "initial" && commandActions[commandInput].component}
         </CommandList>
       </CommandDialog>
     </>
@@ -97,3 +119,97 @@ function SearchBar({}: Props) {
 }
 
 export default SearchBar
+
+type InitialSearchProps = {
+  setCommandInput: React.Dispatch<React.SetStateAction<string>>
+  commandInput: string
+}
+
+const InitialSearch = ({
+  setCommandInput,
+  commandInput,
+}: InitialSearchProps) => {
+  return (
+    <div>
+      <CommandGroup heading="Actions">
+        <CommandItem
+          onSelect={() => {
+            setCommandInput("title")
+          }}
+        >
+          Search by Title
+        </CommandItem>
+        <CommandItem
+          onSelect={() => {
+            setCommandInput("author")
+          }}
+        >
+          Search by Author
+        </CommandItem>
+      </CommandGroup>
+    </div>
+  )
+}
+
+type SearchProps = {
+  results: Array<any>
+}
+
+const TitleSearch = ({ results }: SearchProps) => {
+  return (
+    <div>
+      <CommandGroup heading="Title Search Results">
+        {results &&
+          results.map((result) => {
+            console.log(result)
+            return (
+              <CommandItem
+                className="flex justify-between"
+                key={result.id}
+                value={
+                  result.volumeInfo.title +
+                  "-" +
+                  result.volumeInfo.publishedDate
+                }
+              >
+                <img src={result.volumeInfo.imageLinks.thumbnail}></img>
+                {result.volumeInfo.title}
+                <span cmdk-raycast-meta="">
+                  {result.volumeInfo.publishedDate}
+                </span>
+              </CommandItem>
+            )
+          })}
+      </CommandGroup>
+    </div>
+  )
+}
+
+const AuthorSearch = ({ results }: SearchProps) => {
+  return (
+    <div>
+      <CommandGroup heading="Author Search Results">
+        {results &&
+          results.map((result) => {
+            console.log(result)
+            return (
+              <CommandItem
+                className="flex justify-between"
+                key={result.id}
+                value={
+                  result.volumeInfo.title +
+                  "-" +
+                  result.volumeInfo.publishedDate
+                }
+              >
+                {result.volumeInfo.title}
+                <span cmdk-raycast-meta="">
+                  {result.volumeInfo.publishedDate}
+                </span>
+              </CommandItem>
+            )
+          })}
+      </CommandGroup>
+    </div>
+  )
+}
