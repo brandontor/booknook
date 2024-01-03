@@ -39,28 +39,9 @@ async function page({ params }: PageProps) {
   return (
     <div className="container py-4 mt-4 relative border overflow-hidden rounded-[0.5rem] shadow-md ">
       <div className="flex justify-around">
-        <div className="flex flex-col">
+        <div className="flex flex-col justify-between">
           <CardsContainer>
-            <BookDetails></BookDetails>
-          </CardsContainer>
-          <CardsContainer>
-            <BookDetails></BookDetails>
-          </CardsContainer>
-        </div>
-        <div className="flex flex-col">
-          <CardsContainer>
-            <BookDetails></BookDetails>
-          </CardsContainer>
-          <CardsContainer>
-            <BookDetails></BookDetails>
-          </CardsContainer>
-        </div>
-        <div className="flex flex-col">
-          <CardsContainer>
-            <BookDetails></BookDetails>
-          </CardsContainer>
-          <CardsContainer>
-            <BookDetails></BookDetails>
+            <BookDetails bookData={bookData}></BookDetails>
           </CardsContainer>
         </div>
       </div>
