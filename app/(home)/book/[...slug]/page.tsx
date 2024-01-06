@@ -20,7 +20,6 @@ async function page({ params }: PageProps) {
     `https://www.googleapis.com/books/v1/volumes/${bookID}`
   )
   const bookData = await request.json()
-  console.log(bookData)
 
   function CardsContainer({
     className,
