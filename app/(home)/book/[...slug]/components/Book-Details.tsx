@@ -15,14 +15,21 @@ type Props = {
 }
 
 function BookDetails({ bookData }: Props) {
+  const book = {
+    title: bookData.volumeInfo.title || "N/A",
+    description: bookData.volumeInfo.subtitle || "N/A",
+    imageSrc: bookData.volumeInfo.imageLinks.large,
+    imageAlt: "Alt Text",
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{bookData.volumeInfo.title}</CardTitle>
-        <CardDescription>{bookData.volumeInfo.subtitle}</CardDescription>
+        <CardTitle>{book.title}</CardTitle>
+        <CardDescription>{book.description}</CardDescription>
         <Image
-          src={bookData.volumeInfo.imageLinks.large}
-          alt="image link"
+          src={book.imageSrc}
+          alt={book.imageAlt}
           width={200}
           height={200}
         ></Image>
@@ -31,11 +38,7 @@ function BookDetails({ bookData }: Props) {
       <CardFooter className="flex flex-col items-start">
         <div className="flex flex-col">
           <p>Authors</p>
-          <ul className="flex">
-            {bookData.volumeInfo.authors.map((author: any, index: any) => {
-              return <li key={index}>{author}</li>
-            })}
-          </ul>
+          <ul className="flex"></ul>
         </div>
         <p>Page Count: {bookData.volumeInfo.pageCount}</p>
       </CardFooter>
