@@ -203,7 +203,7 @@ const SearchResults = ({
   }
 
   const bookSelectionHandler = (result: any) => {
-    router.push(`/book/${result.id}`)
+    router.push(`/home/book/${result.id}`)
     setOpen(false)
   }
 
