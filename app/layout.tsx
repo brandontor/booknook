@@ -32,7 +32,6 @@ interface RootLayoutProps {
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const user = await currentUser()
-
   return (
     <>
       <ClerkProvider>
