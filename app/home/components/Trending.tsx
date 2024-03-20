@@ -38,6 +38,42 @@ function Trending({}: Props) {
             </div>
           </div>
         </div>
+        <div className="flex items-center justify-between space-x-4">
+          <div className="flex items-center space-x-4">
+            <Icons.gitHub></Icons.gitHub>
+            <div>
+              <p className="text-sm font-medium leading-none">Book 1</p>
+              <p className="text-sm text-muted-foreground">Example text</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between space-x-4">
+          <div className="flex items-center space-x-4">
+            <Icons.gitHub></Icons.gitHub>
+            <div>
+              <p className="text-sm font-medium leading-none">Book 1</p>
+              <p className="text-sm text-muted-foreground">Example text</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between space-x-4">
+          <div className="flex items-center space-x-4">
+            <Icons.gitHub></Icons.gitHub>
+            <div>
+              <p className="text-sm font-medium leading-none">Book 1</p>
+              <p className="text-sm text-muted-foreground">Example text</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between space-x-4">
+          <div className="flex items-center space-x-4">
+            <Icons.gitHub></Icons.gitHub>
+            <div>
+              <p className="text-sm font-medium leading-none">Book 1</p>
+              <p className="text-sm text-muted-foreground">Example text</p>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

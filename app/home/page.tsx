@@ -43,14 +43,8 @@ export default function IndexPage() {
             <Container>
               <Trending></Trending>
             </Container>
-            <Container>
-              <Trending></Trending>
-            </Container>
           </div>
           <div className="col-span-2 grid items-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1">
-            <Container>
-              <MyBookShelves></MyBookShelves>
-            </Container>
             <Container>
               <MyBookShelves></MyBookShelves>
             </Container>
