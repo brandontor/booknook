@@ -18,5 +18,5 @@ export async function GET(request: NextRequest) {
     headers: requestHeaders,
   })
   const data = await res.json()
-  return Response.json({ data })
+  return
 }
